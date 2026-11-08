@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Teleinfo</title>
+<link rel="stylesheet" href="app.css">
+<script src="proto-config.js" onerror="void 0"></script>
+</head>
+<body>
+<header class="barre">
+  <h1 id="titre">Teleinfo</h1>
+  <span id="etat" class="etat" title="Fraîcheur des données"><i></i><span>…</span></span>
+</header>
+
+<main>
+  <!-- ACCUEIL -->
+  <section id="v-accueil" class="vue">
+    <article class="carte hero">
+      <div class="ligne">
+        <span class="sur">Puissance</span>
+        <span id="periode" class="puce">…</span>
+      </div>
+      <div class="grand"><span id="p-w">…</span><small>W</small></div>
+      <div class="jauge" aria-hidden="true"><div id="jauge"></div></div>
+      <div class="ligne sous">
+        <span id="p-pct">…</span>
+        <span id="p-detail">…</span>
+      </div>
+      <svg id="spark" class="spark" viewBox="0 0 300 56" preserveAspectRatio="none" aria-label="15 dernières minutes"></svg>
+      <div class="ligne legende"><span>il y a 15 min</span><span>maintenant</span></div>
+    </article>
+
+    <article class="carte">
+      <h2>Énergie consommée</h2>
+      <div class="duo">
+        <div><span class="sur">Aujourd'hui</span><b id="e-auj">…</b><small>kWh</small></div>
+        <div><span class="sur">Hier</span><b id="e-hier">…</b><small>kWh</small></div>
+      </div>
+    </article>
+
+    <article class="carte">
+      <h2>Contrat</h2>
+      <dl class="liste">
+        <dt>Tarif</dt><dd id="c-tarif">…</dd>
+        <dt>Puissance souscrite</dt><dd id="c-pref">…</dd>
+        <dt>Pic du jour</dt><dd id="c-pic">…</dd>
+        <dt>Index total</dt><dd id="c-index">…</dd>
+      </dl>
+    </article>
+
+    <article class="carte">
+      <h2>Module</h2>
+      <dl class="liste">
+        <dt>Compteur</dt><dd id="m-compteur">…</dd>
+        <dt>Trames reçues</dt><dd id="m-trames">…</dd>
+        <dt>Wi-Fi</dt><dd id="m-wifi">…</dd>
+        <dt>Allumé depuis</dt><dd id="m-uptime">…</dd>
+      </dl>
+    </article>
+  </section>
+
+  <!-- COURBES -->
+  <section id="v-courbes" class="vue" hidden>
+    <div class="segments" id="s-periode" role="tablist">
+      <button data-v="0">Direct</button><button data-v="1" class="actif">24 h</button><button data-v="2">Semaine</button>
+    </div>
+    <div class="segments" id="s-donnee" role="tablist">
+      <button data-v="2" class="actif">W</button><button data-v="0">VA</button><button data-v="3">Volts</button><button data-v="5">cos φ</button>
+    </div>
+    <article class="carte graphe">
+      <div class="ligne">
+        <span class="sur" id="g-titre">Puissance active</span>
+        <span class="puce" id="g-pointe">…</span>
+      </div>
+      <svg id="graphe" viewBox="0 0 360 240" aria-label="Courbe"></svg>
+      <div class="resume" id="g-resume"></div>
+    </article>
+    <p class="note">Glisser le doigt sur la courbe pour lire une valeur.</p>
+  </section>
+
+  <!-- REGLAGES -->
+  <section id="v-reglages" class="vue" hidden>
+    <article class="carte">
+      <h2>Teleinfo</h2>
+      <nav class="menu">
+        <a data-module="/tic-cfg">Compteur et publication<span>mode, données, intégrations</span></a>
+        <a data-module="/relay">Relais virtuels<span>association aux périodes</span></a>
+        <a data-module="/solar-cfg">Production solaire</a>
+        <a data-module="/awtrix">Afficheur Awtrix</a>
+        <a data-module="/option">Options<span>réseau, capteurs, système</span></a>
+      </nav>
+    </article>
+    <article class="carte">
+      <h2>Avancé (Tasmota)</h2>
+      <nav class="menu">
+        <a data-module="/cn">Configuration Tasmota</a>
+        <a data-module="/in">Informations</a>
+        <a data-module="/mn">Outils<span>console, fichiers, GPIO</span></a>
+        <a data-module="/up">Mise à jour du firmware</a>
+        <a data-module="/">Interface d'origine</a>
+      </nav>
+    </article>
+  </section>
+</main>
+
+<nav class="onglets">
+  <a href="#accueil" data-vue="accueil"><svg viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></svg>Accueil</a>
+  <a href="#courbes" data-vue="courbes"><svg viewBox="0 0 24 24"><path d="M3 20h18v-2H3zm2-4 4-6 4 3 6-8 1.6 1.2L13.4 16 9.5 13 6.7 17.2z"/></svg>Courbes</a>
+  <a data-module="/histo"><svg viewBox="0 0 24 24"><path d="M4 20h3v-9H4zm6.5 0h3V4h-3zM17 20h3v-6h-3z"/></svg>Historique</a>
+  <a href="#reglages" data-vue="reglages"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.9a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5A3.5 3.5 0 1 1 13 8.5a3.5 3.5 0 0 1 0 7z"/></svg>Réglages</a>
+</nav>
+
+<div id="bulle" class="bulle" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+/* Interface mobile Teleinfo : Material Design 3, couleurs du thème Lovelace par défaut de Home Assistant */
+:root {
+  --primaire: #03a9f4; --accent: #ff9800; --hc: #03a9f4; --hp: #ff9800;
+  --fond: #fafafa; --carte: #ffffff; --texte: #212121; --texte-2: #727272;
+  --trait: #e0e0e0; --conteneur: #e1f5fe; --sur-conteneur: #01579b;
+  --rayon: 16px; --ombre: 0 1px 3px rgba(0,0,0,.12);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #111111; --carte: #1c1c1c; --texte: #e1e1e1; --texte-2: #9b9b9b;
+    --trait: #2f2f2f; --conteneur: #0d3a52; --sur-conteneur: #b3e5fc; --ombre: none;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--fond); color: var(--texte);
+  font: 16px/1.4 Roboto, system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+
+.barre { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top)); background: var(--fond); }
+.barre h1 { margin: 0; font-size: 22px; font-weight: 500; }
+.etat { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--texte-2); }
+.etat i { width: 8px; height: 8px; border-radius: 50%; background: var(--texte-2); }
+.etat.ok i { background: #4caf50; }
+.etat.ko i { background: #f44336; }
+
+main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
+.vue { display: flex; flex-direction: column; gap: 12px; }
+.vue[hidden] { display: none; }
+
+.carte { background: var(--carte); border-radius: var(--rayon); padding: 16px; box-shadow: var(--ombre); }
+.carte h2 { margin: 0 0 8px; font-size: 14px; font-weight: 500; color: var(--texte-2); letter-spacing: .1px; }
+.sur { font-size: 14px; color: var(--texte-2); }
+.ligne { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.puce { font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 8px;
+  background: var(--conteneur); color: var(--sur-conteneur); white-space: nowrap; }
+.puce.hp { background: rgba(255,152,0,.18); color: var(--hp); }
+
+.hero .grand { font-size: 56px; font-weight: 400; line-height: 1.1; margin: 4px 0 12px; font-variant-numeric: tabular-nums; }
+.hero .grand small { font-size: 22px; margin-left: 6px; color: var(--texte-2); }
+.jauge { height: 8px; border-radius: 4px; background: var(--trait); overflow: hidden; }
+.jauge div { height: 100%; width: 0; border-radius: 4px; background: var(--primaire); transition: width .6s; }
+.sous { margin-top: 8px; font-size: 14px; color: var(--texte-2); }
+.spark { width: 100%; height: 56px; margin-top: 16px; display: block; }
+.spark path.aire { fill: var(--primaire); opacity: .18; }
+.spark path.trait { fill: none; stroke: var(--primaire); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.legende { font-size: 12px; color: var(--texte-2); }
+
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.duo b { display: inline-block; margin-top: 2px; font-size: 28px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.duo small { margin-left: 4px; color: var(--texte-2); }
+.duo .sur { display: block; }
+
+.liste { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; margin: 0; font-size: 15px; }
+.liste dt { color: var(--texte-2); }
+.liste dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+.segments { display: flex; border: 1px solid var(--trait); border-radius: 20px; overflow: hidden; }
+.segments button { flex: 1; min-height: 40px; border: 0; background: none; color: var(--texte);
+  font: 500 14px/1 inherit; font-family: inherit; cursor: pointer; }
+.segments button + button { border-left: 1px solid var(--trait); }
+.segments button.actif { background: var(--conteneur); color: var(--sur-conteneur); }
+
+.graphe svg { width: 100%; height: auto; display: block; margin-top: 8px; touch-action: none; }
+.graphe .grille { stroke: var(--trait); stroke-width: 1; }
+.graphe text { fill: var(--texte-2); font-size: 11px; font-family: inherit; }
+.graphe path.aire { fill: var(--primaire); opacity: .16; }
+.graphe path.trait { fill: none; stroke: var(--primaire); stroke-width: 1.6; stroke-linejoin: round; }
+.graphe line.curseur { stroke: var(--texte); stroke-width: 1; stroke-dasharray: 3 3; }
+.graphe circle.point { fill: var(--primaire); stroke: var(--carte); stroke-width: 2; }
+.graphe text.vide { font-size: 14px; }
+.resume { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; text-align: center; }
+.resume span { display: block; font-size: 12px; color: var(--texte-2); }
+.resume b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.note { margin: 0 4px; font-size: 13px; color: var(--texte-2); }
+
+.menu a { position: relative; display: block; padding: 12px 24px 12px 0; color: var(--texte); text-decoration: none; cursor: pointer; }
+.menu a + a { border-top: 1px solid var(--trait); }
+.menu a span { display: block; font-size: 13px; color: var(--texte-2); }
+.menu a::after { content: "›"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); color: var(--texte-2); font-size: 22px; }
+
+.onglets { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; justify-content: space-around;
+  padding: 8px 0 calc(12px + env(safe-area-inset-bottom)); background: var(--carte); border-top: 1px solid var(--trait); }
+.onglets a { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 72px;
+  font-size: 12px; font-weight: 500; color: var(--texte-2); text-decoration: none; cursor: pointer; }
+.onglets svg { width: 24px; height: 24px; padding: 4px 20px; box-sizing: content-box; border-radius: 16px; fill: currentColor; }
+.onglets a.actif { color: var(--texte); }
+.onglets a.actif svg { background: var(--conteneur); color: var(--sur-conteneur); }
+
+.bulle { position: fixed; z-index: 4; padding: 6px 10px; border-radius: 8px; pointer-events: none;
+  background: #323232; color: #fff; font-size: 13px; white-space: nowrap; transform: translate(-50%, -110%); }
