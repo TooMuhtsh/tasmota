@@ -54,7 +54,7 @@
       <h2>Module</h2>
       <dl class="liste">
         <dt>Compteur</dt><dd id="m-compteur">…</dd>
-        <dt>Trames reçues</dt><dd id="m-trames">…</dd>
+        <dt>Trames reçues</dt><dd><a href="#messages" class="lien" id="m-trames">…</a></dd>
         <dt>Wi-Fi</dt><dd id="m-wifi">…</dd>
         <dt>Allumé depuis</dt><dd id="m-uptime">…</dd>
       </dl>
@@ -80,11 +80,24 @@
     <p class="note">Glisser le doigt sur la courbe pour lire une valeur.</p>
   </section>
 
+  <!-- MESSAGES -->
+  <section id="v-messages" class="vue" hidden>
+    <article class="carte">
+      <div class="ligne"><span class="sur" id="m-resume">…</span></div>
+      <p class="alerte" id="m-erreurs" hidden></p>
+      <label class="interrupteur"><input type="checkbox" id="m-voir"><span></span>Afficher les identifiants du compteur</label>
+      <label class="interrupteur"><input type="checkbox" id="m-somme"><span></span>Afficher les sommes de contrôle</label>
+      <button class="bouton" id="m-copier">Copier la trame</button>
+    </article>
+    <div id="m-groupes" class="pile"></div>
+  </section>
+
   <!-- REGLAGES -->
   <section id="v-reglages" class="vue" hidden>
     <article class="carte">
       <h2>Teleinfo</h2>
       <nav class="menu">
+        <a href="#messages">Messages du compteur<span>étiquettes TIC en clair</span></a>
         <a data-module="/tic-cfg">Compteur et publication<span>mode, données, intégrations</span></a>
         <a data-module="/relay">Relais virtuels<span>association aux périodes</span></a>
         <a data-module="/solar-cfg">Production solaire</a>
@@ -114,5 +127,6 @@
 
 <div id="bulle" class="bulle" hidden></div>
 <script src="app.js"></script>
+<script src="messages.js"></script>
 </body>
 </html>
