@@ -78,10 +78,10 @@ function analyserLignes(txt) {
   for (const l of txt.split('\n')) {
     const f = l.split(';');
     if (f[0] === 'msg') { nb = +f[1]; continue; }
-    if (f.length < 4) continue;
-    lignes.push({ ok: f[1] === 'ok', cle: f[2], val: f[3].trim(), somme: f[4] ?? '' });
+    if (f.length < 5 || !f[2]) continue;              // lignes vides de fin de tableau
+    lignes[+f[0]] = { ok: f[1] === 'ok', cle: f[2], val: f[3].trim(), somme: f[4] };
   }
-  return { lignes, nb };
+  return { lignes: lignes.filter(Boolean), nb };
 }
 
 function afficherMessages() {
