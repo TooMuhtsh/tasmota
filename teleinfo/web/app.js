@@ -51,8 +51,11 @@ let souscrite = 0;           // VA
 
 async function majMesures() {
   try {
-    const s = (await lire('/cm?cmnd=Status%2010', true)).StatusSNS.ENERGY;
+    const sns = (await lire('/cm?cmnd=Status%2010', true)).StatusSNS;
     derniereLecture = Date.now();
+    // le module renvoie tour à tour la section ENERGY et les sections METER / CONTRACT
+    const s = sns.ENERGY;
+    if (!s) return etat();
     $('p-w').textContent = nf(s.Power);
     $('p-detail').textContent = `${nf(s.Voltage)} V · ${nf(s.Current, 1)} A · cos φ ${nf(s.Factor, 2)}`;
     $('e-auj').textContent = nf(s.Today, 2);
@@ -88,8 +91,28 @@ async function majTic() {
     const total = t.EAST || t.BASE;
     if (total) $('c-index').textContent = nf(+total / 1000, 3) + ' kWh';
     $('m-compteur').textContent = `Linky, mode ${standard ? 'standard' : 'historique'}`;
+    indexTic(t);
     $('m-trames').textContent = nf(t._msg);
   } catch (e) { console.warn(e); }
+}
+
+// index par période depuis la trame : EASFxx (Standard) ou BASE / HCHC / HCHP… (Historique)
+const INDEX_HISTO = { BASE: 'Base', HCHC: 'Creuses', HCHP: 'Pleines', EJPHN: 'Normales', EJPHPM: 'Pointe mobile',
+  BBRHCJB: 'Creuses bleu', BBRHPJB: 'Pleines bleu', BBRHCJW: 'Creuses blanc', BBRHPJW: 'Pleines blanc', BBRHCJR: 'Creuses rouge', BBRHPJR: 'Pleines rouge' };
+function indexTic(t) {
+  const code = (t.NGTF || '').replace(/ /g, '').replace('/', '_');
+  const noms = (typeof PERIODES_CONNUES === 'object' && PERIODES_CONNUES[code]) || [];
+  const lignes = [];
+  // contrat connu : seulement ses périodes (les registres d'un ancien contrat restent figés dans la trame)
+  for (let k = 1; k <= (noms.length || 10); k++) {
+    const v = t['EASF' + String(k).padStart(2, '0')];
+    if (v && +v) lignes.push([noms[k - 1]?.[0] || 'Index ' + k, +v, +t.NTARF === k]);
+  }
+  for (const [cle, nom] of Object.entries(INDEX_HISTO)) if (t[cle] && +t[cle]) lignes.push([nom, +t[cle], false]);
+  if (!lignes.length) return;
+  $('c-periodes').hidden = false;
+  $('c-index-periodes').innerHTML = lignes.map(([nom, v, cour]) =>
+    `<dt${cour ? ' class="courante"' : ''}>${nom}${cour ? ' · en cours' : ''}</dt><dd>${nf(v / 1000, 3)} kWh</dd>`).join('');
 }
 
 async function majModule() {
