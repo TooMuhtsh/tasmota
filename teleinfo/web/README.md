@@ -2,14 +2,20 @@
 
 Nouvelle interface web pensée pour le téléphone, **à côté** de l'interface actuelle : les pages existantes ne sont pas modifiées.
 
-| Accueil | Courbes 24 h | Réglages |
+| Accueil | Courbes 24 h | Historique |
 |---|---|---|
-| ![](captures/prototype/accueil-sombre.png) | ![](captures/prototype/courbes-24h.png) | ![](captures/prototype/reglages.png) |
+| ![](captures/prototype/accueil-sombre.png) | ![](captures/prototype/courbes-24h.png) | ![](captures/prototype/historique-jour.png) |
+
+| Historique, tous contrats | Messages TIC | Réglage du compteur |
+|---|---|---|
+| ![](captures/prototype/historique-annee.png) | ![](captures/prototype/messages.png) | ![](captures/prototype/reglage-compteur.png) |
 
 ## Principe
 
 - HTML, CSS et JavaScript sans dépendance ni étape de compilation (`index.html`, `app.css`, `app.js`).
-- Ne lit que des routes déjà présentes dans le firmware : `/cm?cmnd=Status 10`, `/tic-msg.upd`, `/info.json`, `/graph` + `/graph.upd`.
+- Ne lit que des routes déjà présentes dans le firmware : `/cm?cmnd=Status 10`, `/tic-msg.upd`, `/info.json`, `/graph` + `/graph.upd`, les CSV d'historique (`/ufsd?download=`) et les pages de réglage Teleinfo.
+- Les réglages Teleinfo (`/tic-cfg`, `/relay`, `/solar-cfg`, `/awtrix`, `/option`) sont relus depuis les pages d'origine et enregistrés avec les mêmes paramètres : aucun code C++ à modifier.
+- L'historique peut afficher tous les contrats de l'année ensemble, ce qui garde la consommation visible après un changement de contrat.
 - Material Design 3, thème clair ou sombre selon le téléphone.
 - Les réglages et les écrans Tasmota restent ceux du firmware, regroupés dans un onglet « Réglages ».
 
@@ -19,7 +25,7 @@ Nouvelle interface web pensée pour le téléphone, **à côté** de l'interface
 python3 teleinfo/web/proto/serveur.py --module <IP du module>
 ```
 
-puis ouvrir `http://<IP de la machine>:8099/` sur le téléphone. Le serveur relaie seulement des lectures (seules les commandes `Status` passent par `/cm`).
+puis ouvrir `http://<IP de la machine>:8099/` sur le téléphone. Le serveur relaie seulement des lectures (seules les commandes `Status` passent par `/cm`, et l'enregistrement des réglages est refusé).
 
 ## Suite
 
