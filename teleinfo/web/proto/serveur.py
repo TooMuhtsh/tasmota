@@ -23,6 +23,8 @@ WEB = pathlib.Path(__file__).resolve().parent.parent
 RELAIS = {"/graph.upd", "/tic-msg.upd", "/info.json"}
 # /graph ne sert qu'à choisir période et donnée avant /graph.upd
 GRAPH_ARGS = re.compile(r"^(period=[0-2])?&?(data=[0-5])?$")
+# pages de réglage Teleinfo : lues pour être réaffichées, jamais enregistrées (une requête avec paramètres = écriture)
+PAGES_REGLAGE = {"/tic-cfg", "/relay", "/solar-cfg", "/awtrix", "/option"}
 # liste des fichiers et lecture des CSV d'historique
 FICHIER_CSV = re.compile(r"^download=/teleinfo-[A-Za-z0-9_+-]*\d{4}\.csv$")
 # seules les commandes Status sont autorisées sur /cm
@@ -70,6 +72,11 @@ class Gestion(http.server.SimpleHTTPRequestHandler):
             self.relayer(url.path)
         elif url.path == "/graph" and GRAPH_ARGS.match(url.query):
             self.relayer(f"/graph?{url.query}")
+        elif url.path in PAGES_REGLAGE:
+            if url.query:
+                self.send_error(403, "enregistrement désactivé dans le serveur de développement")
+            else:
+                self.relayer(url.path)
         elif url.path == "/ufsd" and (url.query == "" or FICHIER_CSV.match(url.query)):
             self.relayer("/ufsd?" + url.query)
         elif url.path == "/cm":

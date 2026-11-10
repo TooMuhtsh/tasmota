@@ -127,3 +127,31 @@ main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
 .repartition dt { display: flex; align-items: center; gap: 8px; }
 .repartition dt i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
 .repartition dd small { color: var(--texte-2); margin-left: 6px; }
+
+/* formulaires de réglage */
+.retour { color: var(--primaire); text-decoration: none; font-weight: 500; padding: 4px; }
+.reglage + .reglage { border-top: 1px solid var(--trait); }
+.reglage { padding: 4px 0; }
+.reglage .titre { display: block; padding-top: 8px; }
+.interrupteur b, .radio b { flex: 1; font-weight: 400; }
+.interrupteur b small, .radio b small { display: block; font-size: 13px; color: var(--texte-2); margin-top: 2px; }
+.interrupteur { justify-content: space-between; }
+.interrupteur span { order: 2; }
+.interrupteur input:disabled + span { opacity: .4; }
+.radio { display: flex; align-items: center; gap: 16px; min-height: 48px; font-size: 15px; cursor: pointer; }
+.radio input { position: absolute; opacity: 0; width: 0; height: 0; }
+.radio span { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--texte-2); box-sizing: border-box; }
+.radio input:checked + span { border-color: var(--primaire); background: radial-gradient(var(--primaire) 45%, transparent 50%); }
+.saisie { display: flex; align-items: center; gap: 12px; min-height: 56px; font-size: 15px; }
+.saisie span { flex: 1; }
+.saisie span small { display: block; font-size: 12px; color: var(--texte-2); }
+.saisie input { width: 46%; min-height: 44px; padding: 0 12px; border: 1px solid var(--trait); border-radius: 8px;
+  background: var(--fond); color: var(--texte); font: inherit; text-align: right; }
+.saisie input:focus { outline: 2px solid var(--primaire); border-color: transparent; }
+.saisie i { font-style: normal; color: var(--texte-2); font-size: 14px; }
+.segments.petits { margin: 8px 0; }
+.segments.petits button { min-height: 36px; font-size: 13px; }
+.actions { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.actions .note { margin: 0; }
+.reglage[hidden] { display: none; }
+.interrupteur b small, .radio b small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

@@ -114,17 +114,28 @@
     <div id="m-groupes" class="pile"></div>
   </section>
 
+  <!-- UN FORMULAIRE DE REGLAGE -->
+  <section id="v-reglage" class="vue" hidden>
+    <a href="#reglages" class="retour">‹ Réglages</a>
+    <div id="r-champs" class="pile"></div>
+    <article class="carte actions">
+      <button class="bouton" id="r-enregistrer">Enregistrer</button>
+      <p class="note" id="r-etat"></p>
+      <a id="r-origine" class="lien">Ouvrir la page d'origine</a>
+    </article>
+  </section>
+
   <!-- REGLAGES -->
   <section id="v-reglages" class="vue" hidden>
     <article class="carte">
       <h2>Teleinfo</h2>
       <nav class="menu">
         <a href="#messages">Messages du compteur<span>étiquettes TIC en clair</span></a>
-        <a data-module="/tic-cfg">Compteur et publication<span>mode, données, intégrations</span></a>
-        <a data-module="/relay">Relais virtuels<span>association aux périodes</span></a>
-        <a data-module="/solar-cfg">Production solaire</a>
-        <a data-module="/awtrix">Afficheur Awtrix</a>
-        <a data-module="/option">Options<span>réseau, capteurs, système</span></a>
+        <a href="#reglage=/tic-cfg">Compteur et publication<span>mode, données, intégrations</span></a>
+        <a href="#reglage=/relay">Relais virtuels<span>association aux périodes</span></a>
+        <a href="#reglage=/solar-cfg">Production solaire</a>
+        <a href="#reglage=/awtrix">Afficheur Awtrix</a>
+        <a href="#reglage=/option">Options<span>réseau, capteurs, système</span></a>
       </nav>
     </article>
     <article class="carte">
@@ -151,5 +162,6 @@
 <script src="app.js"></script>
 <script src="messages.js"></script>
 <script src="histo.js"></script>
+<script src="reglages.js"></script>
 </body>
 </html>

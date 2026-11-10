@@ -20,9 +20,12 @@ function el(nom, attrs = {}, parent) {
 }
 
 /* ---------- état et fraîcheur ---------- */
-let derniereLecture = 0;
+let derniereLecture = 0, horsLigne = false;
 function etat() {
   const age = (Date.now() - derniereLecture) / 1000;
+  // retour du module après une coupure ou un redémarrage : on relit tout l'écran affiché
+  if (derniereLecture && age >= 20) horsLigne = true;
+  else if (horsLigne && age < 20) { horsLigne = false; afficher(); majTic(); majModule(); }
   const e = $('etat');
   e.className = 'etat ' + (age < 20 ? 'ok' : 'ko');
   e.lastElementChild.textContent = derniereLecture
@@ -243,17 +246,19 @@ for (const [id, cle] of [['s-periode', 'periode'], ['s-donnee', 'donnee']])
   });
 
 /* ---------- navigation ---------- */
-let vue = '';
+let vue = '', pageReglage = '';
 document.querySelectorAll('[data-module]').forEach(a => { a.href = MODULE + a.dataset.module; });
 function afficher() {
-  const v = (location.hash || '#accueil').slice(1);
-  vue = ['accueil', 'courbes', 'historique', 'messages', 'reglages'].includes(v) ? v : 'accueil';
+  const [v, arg] = (location.hash || '#accueil').slice(1).split('=');
+  vue = ['accueil', 'courbes', 'historique', 'messages', 'reglages', 'reglage'].includes(v) ? v : 'accueil';
+  pageReglage = arg || '';
   document.querySelectorAll('.vue').forEach(s => { s.hidden = s.id !== 'v-' + vue; });
-  document.querySelectorAll('.onglets a').forEach(a => a.classList.toggle('actif', a.dataset.vue === (vue === 'messages' ? 'reglages' : vue)));
-  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', historique: 'Historique', messages: 'Messages', reglages: 'Réglages' }[vue];
+  document.querySelectorAll('.onglets a').forEach(a => a.classList.toggle('actif', a.dataset.vue === (['messages', 'reglage'].includes(vue) ? 'reglages' : vue)));
+  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', historique: 'Historique', messages: 'Messages', reglages: 'Réglages', reglage: 'Réglages' }[vue];
   if (vue === 'courbes') majCourbe();
   if (vue === 'messages' && typeof majMessages === 'function') majMessages();
   if (vue === 'historique' && typeof majHisto === 'function') majHisto();
+  if (vue === 'reglage' && typeof majReglage === 'function') majReglage(pageReglage);
 }
 addEventListener('hashchange', afficher);
 
