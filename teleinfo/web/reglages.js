@@ -67,11 +67,11 @@ function construireLigne(p, zone, entetes) {
   for (const e of entrees) formulaire.champs.push({ src: e, id: 'r-' + e.name + '-' + (e.value || '') });
 }
 
-async function majReglage(page) {
+async function majReglage(page, garderEtat = false) {
   const zone = $('r-champs');
   $('titre').textContent = PAGES_REGLAGE[page] || page;
   $('r-origine').href = MODULE + page;
-  $('r-etat').textContent = '';
+  if (!garderEtat) $('r-etat').textContent = '';
   zone.innerHTML = '<p class="note">Lecture des réglages…</p>';
   try {
     const doc = new DOMParser().parseFromString(await lire(page), 'text/html');
@@ -125,7 +125,7 @@ $('r-enregistrer').addEventListener('click', async () => {
     if (r.status === 403) { e.textContent = 'Enregistrement désactivé dans le prototype (lecture seule).'; return; }
     if (!r.ok) throw new Error(r.status);
     e.textContent = 'Réglages enregistrés.';
-    majReglage(formulaire.page);
+    majReglage(formulaire.page, true);
   } catch (err) { e.textContent = 'Échec de l\'enregistrement : ' + err.message; }
 });
 

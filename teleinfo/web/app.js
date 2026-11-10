@@ -7,10 +7,16 @@ const $ = id => document.getElementById(id);
 const nf = (v, d = 0) => Number(v).toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const SVGNS = 'http://www.w3.org/2000/svg';
 
-async function lire(url, json = false) {
-  const r = await fetch(url, { cache: 'no-store' });
-  if (!r.ok) throw new Error(url + ' : ' + r.status);
-  return json ? r.json() : r.text();
+// le serveur web du module traite une requête à la fois : on les enchaîne au lieu de les lancer ensemble
+let fileRequetes = Promise.resolve();
+function lire(url, json = false) {
+  const p = fileRequetes.then(async () => {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(url + ' : ' + r.status);
+    return json ? r.json() : r.text();
+  });
+  fileRequetes = p.catch(() => {});
+  return p;
 }
 function el(nom, attrs = {}, parent) {
   const e = document.createElementNS(SVGNS, nom);
@@ -147,7 +153,15 @@ const choix = { periode: 1, donnee: 2 };
 let serie = [];
 const nombreEchelle = s => { const m = /([\d.]+)\s*(k?)/.exec(s || ''); return m ? +m[1] * (m[2] ? 1000 : 1) : NaN; };
 
-async function chargerCourbe() {
+// /graph règle un état partagé du module (période, donnée) lu ensuite par /graph.upd : les deux requêtes d'un
+// chargement ne doivent pas être entrecoupées par celles d'un autre (mini-courbe de l'accueil)
+let fileCourbe = Promise.resolve();
+function chargerCourbe(c = { ...choix }) {
+  const p = fileCourbe.then(() => chargerCourbeSeul(c));
+  fileCourbe = p.catch(() => {});
+  return p;
+}
+async function chargerCourbeSeul(choix) {
   // /graph fixe la période et la donnée côté module, /graph.upd renvoie la courbe en coordonnées SVG (600 px de haut)
   const page = await lire(`/graph?period=${choix.periode}&data=${choix.donnee}`);
   const libelles = [...page.matchAll(/<text class='power' x='2%' y='(\d+)%'>([^<]*)<\/text>/g)];
@@ -213,7 +227,7 @@ function dessinerCourbe() {
   // graduations du temps : 5 min, 6 h ou minuit
   const pasT = { 0: 5 * 60e3, 1: 6 * 3600e3, 2: 24 * 3600e3 }[choix.periode];
   const decal = new Date().getTimezoneOffset() * 60e3;
-  for (let t = Math.ceil((t0 - decal) / pasT) * pasT + decal; t < t1; t += pasT) {
+  for (let t = Math.ceil((t0 - decal) / pasT) * pasT + decal; t < t1 - (t1 - t0) * .04; t += pasT) {
     el('line', { class: 'grille', x1: X(t), x2: X(t), y1: G.t, y2: G.h - G.b, 'stroke-dasharray': '2 4' }, svg);
     el('text', { x: X(t), y: G.h - 6, 'text-anchor': 'middle' }, svg).textContent = etiquetteTemps(t, choix.periode);
   }
@@ -294,10 +308,7 @@ setInterval(majModule, 60000);
 // amorce la mini-courbe avec le « direct » du module (15 min)
 (async () => {
   try {
-    const c = choix.periode, d = choix.donnee;
-    Object.assign(choix, { periode: 0, donnee: 2 });
-    const pts = await chargerCourbe();
-    Object.assign(choix, { periode: c, donnee: d });
+    const pts = await chargerCourbe({ periode: 0, donnee: 2 });
     if (pts.length > 1 && spark.length < 3) { spark.unshift(...pts.filter(p => p[0] < (spark[0]?.[0] ?? Infinity))); dessinerSpark(); }
   } catch (e) { console.warn(e); }
 })();

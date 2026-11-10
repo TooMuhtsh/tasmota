@@ -27,6 +27,17 @@ python3 teleinfo/web/proto/serveur.py --module <IP du module>
 
 puis ouvrir `http://<IP de la machine>:8099/` sur le téléphone. Le serveur relaie seulement des lectures (seules les commandes `Status` passent par `/cm`, et l'enregistrement des réglages est refusé).
 
+## Installer sur le module, sans recompiler
+
+Le module sert lui-même l'interface grâce à un petit pilote Berry (`berry/mobile.be`) : les fichiers sont copiés dans son système de fichiers et servis sur `/m`. Un bouton « Interface mobile » apparaît sur l'accueil, la page Configuration et les Outils d'origine.
+
+```
+teleinfo/web/berry/installer.sh <IP du module>              # jusqu'au prochain redémarrage
+teleinfo/web/berry/installer.sh <IP du module> --permanent  # chargé à chaque démarrage (autoexec.be)
+```
+
+Pour retirer : supprimer `mobile.be`, les fichiers `mobile-*` et la ligne `load('mobile.be')` de `autoexec.be` depuis le gestionnaire de fichiers.
+
 ## Suite
 
 L'avancement est suivi dans les issues du dépôt (étiquette `interface-mobile`).
