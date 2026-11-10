@@ -80,6 +80,28 @@
     <p class="note">Glisser le doigt sur la courbe pour lire une valeur.</p>
   </section>
 
+  <!-- HISTORIQUE -->
+  <section id="v-historique" class="vue" hidden>
+    <div class="segments" id="h-echelle" role="tablist">
+      <button data-v="jour" class="actif">Jour</button><button data-v="semaine">Semaine</button><button data-v="mois">Mois</button><button data-v="annee">Année</button>
+    </div>
+    <label class="champ"><span>Contrat</span><select id="h-contrat"><option value="tous">Tous les contrats</option></select></label>
+    <article class="carte graphe">
+      <div class="ligne nav-date">
+        <button class="icone" id="h-precedent" aria-label="Précédent">‹</button>
+        <span id="h-titre">…</span>
+        <button class="icone" id="h-suivant" aria-label="Suivant">›</button>
+      </div>
+      <div class="total"><b id="h-total">…</b><small>kWh</small></div>
+      <svg id="h-graphe" viewBox="0 0 360 220" aria-label="Consommation"></svg>
+      <p class="note" id="h-vide" hidden></p>
+    </article>
+    <article class="carte">
+      <h2 id="h-rep-titre">Par période</h2>
+      <dl class="liste repartition" id="h-repartition"></dl>
+    </article>
+  </section>
+
   <!-- MESSAGES -->
   <section id="v-messages" class="vue" hidden>
     <article class="carte">
@@ -121,12 +143,13 @@
 <nav class="onglets">
   <a href="#accueil" data-vue="accueil"><svg viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></svg>Accueil</a>
   <a href="#courbes" data-vue="courbes"><svg viewBox="0 0 24 24"><path d="M3 20h18v-2H3zm2-4 4-6 4 3 6-8 1.6 1.2L13.4 16 9.5 13 6.7 17.2z"/></svg>Courbes</a>
-  <a data-module="/histo"><svg viewBox="0 0 24 24"><path d="M4 20h3v-9H4zm6.5 0h3V4h-3zM17 20h3v-6h-3z"/></svg>Historique</a>
+  <a href="#historique" data-vue="historique"><svg viewBox="0 0 24 24"><path d="M4 20h3v-9H4zm6.5 0h3V4h-3zM17 20h3v-6h-3z"/></svg>Historique</a>
   <a href="#reglages" data-vue="reglages"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.9a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5A3.5 3.5 0 1 1 13 8.5a3.5 3.5 0 0 1 0 7z"/></svg>Réglages</a>
 </nav>
 
 <div id="bulle" class="bulle" hidden></div>
 <script src="app.js"></script>
 <script src="messages.js"></script>
+<script src="histo.js"></script>
 </body>
 </html>

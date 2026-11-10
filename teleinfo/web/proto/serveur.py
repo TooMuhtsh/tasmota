@@ -23,6 +23,8 @@ WEB = pathlib.Path(__file__).resolve().parent.parent
 RELAIS = {"/graph.upd", "/tic-msg.upd", "/info.json"}
 # /graph ne sert qu'à choisir période et donnée avant /graph.upd
 GRAPH_ARGS = re.compile(r"^(period=[0-2])?&?(data=[0-5])?$")
+# liste des fichiers et lecture des CSV d'historique
+FICHIER_CSV = re.compile(r"^download=/teleinfo-[A-Za-z0-9_+-]*\d{4}\.csv$")
 # seules les commandes Status sont autorisées sur /cm
 COMMANDE_LECTURE = re.compile(r"^Status( (0|1|2|5|8|10|11))?$", re.I)
 # le serveur web du module traite une requête à la fois : on les envoie l'une après l'autre
@@ -68,6 +70,8 @@ class Gestion(http.server.SimpleHTTPRequestHandler):
             self.relayer(url.path)
         elif url.path == "/graph" and GRAPH_ARGS.match(url.query):
             self.relayer(f"/graph?{url.query}")
+        elif url.path == "/ufsd" and (url.query == "" or FICHIER_CSV.match(url.query)):
+            self.relayer("/ufsd?" + url.query)
         elif url.path == "/cm":
             cmnd = urllib.parse.parse_qs(url.query).get("cmnd", [""])[0]
             if COMMANDE_LECTURE.match(cmnd):

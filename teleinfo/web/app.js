@@ -247,12 +247,13 @@ let vue = '';
 document.querySelectorAll('[data-module]').forEach(a => { a.href = MODULE + a.dataset.module; });
 function afficher() {
   const v = (location.hash || '#accueil').slice(1);
-  vue = ['accueil', 'courbes', 'messages', 'reglages'].includes(v) ? v : 'accueil';
+  vue = ['accueil', 'courbes', 'historique', 'messages', 'reglages'].includes(v) ? v : 'accueil';
   document.querySelectorAll('.vue').forEach(s => { s.hidden = s.id !== 'v-' + vue; });
   document.querySelectorAll('.onglets a').forEach(a => a.classList.toggle('actif', a.dataset.vue === (vue === 'messages' ? 'reglages' : vue)));
-  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', messages: 'Messages', reglages: 'Réglages' }[vue];
+  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', historique: 'Historique', messages: 'Messages', reglages: 'Réglages' }[vue];
   if (vue === 'courbes') majCourbe();
   if (vue === 'messages' && typeof majMessages === 'function') majMessages();
+  if (vue === 'historique' && typeof majHisto === 'function') majHisto();
 }
 addEventListener('hashchange', afficher);
 
