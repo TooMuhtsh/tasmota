@@ -17,6 +17,7 @@ Nouvelle interface web pensée pour le téléphone, **à côté** de l'interface
 - Les réglages Teleinfo (`/tic-cfg`, `/relay`, `/solar-cfg`, `/awtrix`, `/option`) sont relus depuis les pages d'origine et enregistrés avec les mêmes paramètres : aucun code C++ à modifier.
 - L'historique peut afficher tous les contrats de l'année ensemble, ce qui garde la consommation visible après un changement de contrat.
 - Material Design 3, thème clair ou sombre selon le téléphone.
+- Règles d'app embarquée : aucune ressource externe (ni police, ni bibliothèque, ni CDN), environ 64 Ko au total, une requête à la fois vers le module, interrogation limitée à l'écran affiché et suspendue quand l'application passe en arrière-plan, cibles tactiles de 48 px, animations coupées si le téléphone le demande.
 - Les réglages et les écrans Tasmota restent ceux du firmware, regroupés dans un onglet « Réglages ».
 
 ## Essayer sans toucher au module

@@ -130,7 +130,7 @@ async function majMessages() {
     afficherMessages();
   } catch (e) { console.warn(e); }
   etat();
-  if (vue === 'messages') minuteurMessages = setTimeout(majMessages, 3000);
+  if (vue === 'messages' && !document.hidden) minuteurMessages = setTimeout(majMessages, 5000);
 }
 
 $('m-voir').addEventListener('change', ev => { msgEtat.voir = ev.target.checked; afficherMessages(); });

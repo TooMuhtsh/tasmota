@@ -84,7 +84,7 @@ async function majReglage(page, garderEtat = false) {
       const carte = document.createElement('article');
       carte.className = 'carte';
       carte.innerHTML = `<h2>${echap(fs.querySelector('legend')?.textContent.replace(/^[^\p{L}\p{N}]+/u, '').trim() || '')}</h2>`;
-      const entetes = [...fs.querySelectorAll('p.header .cb')].map(s => s.textContent.trim() === '❌' ? 'Aucun' : s.textContent.trim());
+      const entetes = [...fs.querySelectorAll('p.header .cb')].map(s => s.textContent.trim() === '❌' ? 'Aucun' : /^\d+$/.test(s.textContent.trim()) ? 'Relais ' + s.textContent.trim() : s.textContent.trim());
       for (const p of fs.querySelectorAll('p')) if (!p.classList.contains('header')) construireLigne(p, carte, entetes);
       if (carte.children.length > 1) zone.appendChild(carte);
     }

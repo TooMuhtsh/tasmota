@@ -37,7 +37,7 @@ function etat() {
   e.lastElementChild.textContent = derniereLecture
     ? (age < 20 ? 'en direct' : 'hors ligne depuis ' + Math.round(age) + ' s') : 'connexion…';
 }
-setInterval(etat, 1000);
+setInterval(() => { if (!document.hidden) etat(); }, 1000);
 
 /* ---------- messages TIC ---------- */
 function analyserTic(txt) {
@@ -271,7 +271,7 @@ async function majCourbe() {
   clearTimeout(minuteurCourbe);
   try { serie = await chargerCourbe(); dessinerCourbe(); } catch (e) { console.warn(e); }
   etat();
-  if (vue === 'courbes') minuteurCourbe = setTimeout(majCourbe, choix.periode === 0 ? 5000 : 60000);
+  if (vue === 'courbes' && !document.hidden) minuteurCourbe = setTimeout(majCourbe, choix.periode === 0 ? 5000 : 60000);
 }
 for (const [id, cle] of [['s-periode', 'periode'], ['s-donnee', 'donnee']])
   $(id).addEventListener('click', ev => {
@@ -302,9 +302,12 @@ addEventListener('hashchange', afficher);
 /* ---------- démarrage ---------- */
 afficher();
 majMesures(); majTic(); majModule();
-setInterval(() => { if (vue === 'accueil') majMesures(); }, 5000);
-setInterval(majTic, 15000);
-setInterval(majModule, 60000);
+// interrogations du module : seulement pour l'écran affiché, et jamais quand l'application est en arrière-plan
+const actif = v => !document.hidden && vue === v;
+setInterval(() => { if (actif('accueil')) majMesures(); }, 5000);
+setInterval(() => { if (actif('accueil')) majTic(); }, 15000);
+setInterval(() => { if (actif('accueil')) majModule(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { afficher(); if (vue === 'accueil') { majMesures(); majTic(); } } });
 // amorce la mini-courbe avec le « direct » du module (15 min)
 (async () => {
   try {
