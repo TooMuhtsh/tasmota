@@ -296,6 +296,7 @@ function afficher() {
   if (vue === 'messages' && typeof majMessages === 'function') majMessages();
   if (vue === 'historique' && typeof majHisto === 'function') majHisto();
   if (vue === 'reglage' && typeof majReglage === 'function') majReglage(pageReglage);
+  if (vue === 'reglages' && typeof majHa === 'function') majHa();
 }
 addEventListener('hashchange', afficher);
 

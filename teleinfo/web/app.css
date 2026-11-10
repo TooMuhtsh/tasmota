@@ -1,4 +1,5 @@
 /* Interface mobile Teleinfo : Material Design 3, couleurs du thème Lovelace par défaut de Home Assistant */
+[hidden] { display: none !important; }
 :root {
   --primaire: #03a9f4; --accent: #ff9800; --hc: #03a9f4; --hp: #ff9800;
   --fond: #fafafa; --carte: #ffffff; --texte: #212121; --texte-2: #727272;
@@ -161,3 +162,4 @@ main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .menu a, .retour, .lien { min-height: 48px; display: flex; flex-direction: column; justify-content: center; }
 .retour, .lien { display: inline-flex; }
+.liste dd.ko { color: #f44336; }

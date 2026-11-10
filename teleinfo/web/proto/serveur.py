@@ -28,7 +28,7 @@ PAGES_REGLAGE = {"/tic-cfg", "/relay", "/solar-cfg", "/awtrix", "/option"}
 # liste des fichiers et lecture des CSV d'historique
 FICHIER_CSV = re.compile(r"^download=/teleinfo-[A-Za-z0-9_+-]*\d{4}\.csv$")
 # seules les commandes Status sont autorisées sur /cm
-COMMANDE_LECTURE = re.compile(r"^Status( (0|1|2|5|8|10|11))?$", re.I)
+COMMANDE_LECTURE = re.compile(r"^Status( (0|1|2|5|6|8|10|11))?$", re.I)
 # le serveur web du module traite une requête à la fois : on les envoie l'une après l'autre
 VERROU_MODULE = threading.Lock()
 
