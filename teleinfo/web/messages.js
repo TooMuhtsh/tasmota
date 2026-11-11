@@ -79,7 +79,7 @@ function analyserLignes(txt) {
     const f = l.split(';');
     if (f[0] === 'msg') { nb = +f[1]; continue; }
     if (f.length < 5 || !f[2]) continue;              // lignes vides de fin de tableau
-    lignes[+f[0]] = { ok: f[1] === 'ok', cle: f[2], val: f[3].trim(), somme: f[4] };
+    lignes[+f[0]] = { ok: f[1] === 'ok', cle: f[2], val: f[3].trim(), somme: f.slice(4).join(';') };   // somme « ; » : coupée en deux champs vides
   }
   return { lignes: lignes.filter(Boolean), nb };
 }
