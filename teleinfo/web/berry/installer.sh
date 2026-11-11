@@ -10,7 +10,7 @@ cmd() { curl -sf -H "Referer: http://$IP/" --get --data-urlencode "cmnd=$1" "htt
 envoyer() { curl -sf -o /dev/null -H "Referer: http://$IP/" -F "ufsu=@$1;filename=$(basename "$1")" "http://$IP/ufsu?fsz=$(stat -c %s "$1")"; echo "envoyé : $(basename "$1")"; }
 # noms à plat avec le préfixe mobile- (le pilote sert chaque fichier à la racine)
 sed -e 's#href="app.css"#href="/mobile-app.css"#' -e 's#src="\([a-z]*\)\.js"#src="/mobile-\1.js"#g' -e '/proto-config.js/d' "$WEB/index.html" > "$T/mobile-index.html"
-for f in app.css app.js messages.js histo.js reglages.js ha.js; do cp "$WEB/$f" "$T/mobile-$f"; done
+for f in app.css app.js messages.js histo.js reglages.js led.js ha.js; do cp "$WEB/$f" "$T/mobile-$f"; done
 cp "$WEB/berry/mobile.be" "$T/mobile.be"
 for f in "$T"/*; do envoyer "$f"; done
 # autoexec.be : ajoute le chargement s'il n'y est pas déjà (seulement avec --permanent)
@@ -21,5 +21,6 @@ grep -q "load('mobile.be')" "$T/autoexec.be" || { echo "load('mobile.be')" >> "$
 cmd "Br load('mobile.be')"
 # au premier chargement le serveur web tourne déjà : on déclare les adresses tout de suite
 cmd "Br teleinfo_mobile.web_add_handler()"
+cmd "Br teleinfo_led.web_add_handler()"
 rm -rf "$T"
 echo "Interface disponible sur http://$IP/m"

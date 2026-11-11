@@ -35,7 +35,7 @@ const GROUPES = [
   ['Divers', /./],
 ];
 const SECRETS = /^(ADSC|ADCO|PRM)$/;
-const msgEtat = { voir: false, somme: false, lignes: [], nb: 0 };
+const msgEtat = { vus: new Set(), somme: false, lignes: [], nb: 0 };   // vus : identifiants dévoilés d'un toucher
 
 const dateTic = h => /^[HE ]\d{12}$/.test(h)
   ? `${h.slice(5, 7)}/${h.slice(3, 5)}/20${h.slice(1, 3)} ${h.slice(7, 9)}:${h.slice(9, 11)}:${h.slice(11, 13)}` : h;
@@ -50,7 +50,7 @@ function libelle(cle) {
 }
 
 function valeurLisible(cle, v) {
-  if (SECRETS.test(cle) && !msgEtat.voir) return '•'.repeat(Math.min(v.length, 14));
+  if (SECRETS.test(cle) && !msgEtat.vus.has(cle)) return '•'.repeat(Math.min(v.length, 14));
   if (/^(EAST|EASF\d\d|EASD\d\d|EAIT|BASE|HCH[CP]|EJPH(N|PM)|BBRH[CP]J[BWR])$/.test(cle)) return nf(+v / 1000, 3) + ' kWh';
   if (/^ERQ\d$/.test(cle)) return nf(+v / 1000, 3) + ' kvarh';
   if (cle === 'DATE') return dateTic(v.split(' ')[0]);
@@ -107,6 +107,13 @@ function afficherMessages() {
       const nom = libelle(l.cle);
       dt.innerHTML = `<span>${nom || l.cle}</span>${nom ? `<code>${l.cle}</code>` : ''}`;
       dd.textContent = valeurLisible(l.cle, l.val);
+      if (SECRETS.test(l.cle)) {
+        const vu = msgEtat.vus.has(l.cle);
+        Object.assign(dd, { className: 'cache', tabIndex: 0, title: vu ? 'Toucher pour masquer' : 'Toucher pour afficher' });
+        dd.dataset.cle = l.cle;
+        dd.setAttribute('role', 'button');
+        dd.setAttribute('aria-pressed', vu);
+      }
       if (/^0+$/.test(l.val) && /^EAS[FD]/.test(l.cle)) dd.classList.add('nul');
       if (!l.ok) { dt.classList.add('ko'); dd.classList.add('ko'); }
       if (msgEtat.somme) dd.insertAdjacentHTML('beforeend', ` <code class="somme">${l.somme.replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;')}</code>`);
@@ -118,7 +125,7 @@ function afficherMessages() {
 }
 
 function trameTexte(masquer) {
-  return msgEtat.lignes.map(l => `${l.cle}\t${masquer && SECRETS.test(l.cle) ? '0'.repeat(l.val.length) : l.val}\t${l.somme}`).join('\n');
+  return msgEtat.lignes.map(l => `${l.cle}\t${masquer && SECRETS.test(l.cle) && !msgEtat.vus.has(l.cle) ? '0'.repeat(l.val.length) : l.val}\t${l.somme}`).join('\n');
 }
 
 let minuteurMessages;
@@ -133,11 +140,21 @@ async function majMessages() {
   if (vue === 'messages' && !document.hidden) minuteurMessages = setTimeout(majMessages, 5000);
 }
 
-$('m-voir').addEventListener('change', ev => { msgEtat.voir = ev.target.checked; afficherMessages(); });
+// identifiant masqué : un toucher l'affiche, un second le masque
+const basculerSecret = ev => {
+  const dd = ev.target.closest('dd.cache');
+  if (!dd || (ev.type === 'keydown' && ev.key !== 'Enter' && ev.key !== ' ')) return;
+  ev.preventDefault();
+  const cle = dd.dataset.cle;
+  msgEtat.vus.has(cle) ? msgEtat.vus.delete(cle) : msgEtat.vus.add(cle);
+  afficherMessages();
+};
+$('m-groupes').addEventListener('click', basculerSecret);
+$('m-groupes').addEventListener('keydown', basculerSecret);
 $('m-somme').addEventListener('change', ev => { msgEtat.somme = ev.target.checked; afficherMessages(); });
 $('m-copier').addEventListener('click', async () => {
   const b = $('m-copier'), avant = b.textContent;
-  try { await navigator.clipboard.writeText(trameTexte(!msgEtat.voir)); b.textContent = 'Copiée'; }
+  try { await navigator.clipboard.writeText(trameTexte(true)); b.textContent = 'Copiée'; }
   catch { b.textContent = 'Copie impossible'; }
   setTimeout(() => { b.textContent = avant; }, 2000);
 });

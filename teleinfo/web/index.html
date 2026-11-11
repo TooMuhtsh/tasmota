@@ -112,7 +112,7 @@
     <article class="carte">
       <div class="ligne"><span class="sur" id="m-resume">…</span></div>
       <p class="alerte" id="m-erreurs" hidden></p>
-      <label class="interrupteur"><input type="checkbox" id="m-voir"><span></span>Afficher les identifiants du compteur</label>
+      <p class="note">Les identifiants du compteur (ADSC, PRM) sont masqués : touchez-les pour les afficher.</p>
       <label class="interrupteur"><input type="checkbox" id="m-somme"><span></span>Afficher les sommes de contrôle</label>
       <button class="bouton" id="m-copier">Copier la trame</button>
     </article>
@@ -138,12 +138,33 @@
     </article>
   </section>
 
+  <!-- LED -->
+  <section id="v-led" class="vue" hidden>
+    <a href="#reglages" class="retour">‹ Réglages</a>
+    <article class="carte">
+      <div class="ligne"><span class="led-pastille" id="l-pastille"></span><span class="sur" id="l-maintenant">…</span></div>
+      <div id="l-modes"></div>
+    </article>
+    <article class="carte" id="l-couleurs" hidden></article>
+    <article class="carte" id="l-commun" hidden>
+      <h2>Luminosité et nuit</h2>
+      <label class="saisie"><span>Luminosité</span><input type="range" id="l-bri" min="5" max="100" step="5"><i id="l-bri-val"></i></label>
+      <label class="interrupteur"><input type="checkbox" id="l-nuit"><span></span><b>Éteinte la nuit</b></label>
+      <div class="ligne" id="l-nuit-heures"><label class="champ"><span>de</span><select id="l-nuit-de"></select></label><label class="champ"><span>à</span><select id="l-nuit-a"></select></label></div>
+    </article>
+    <article class="carte actions">
+      <button class="bouton" id="l-enregistrer">Enregistrer</button>
+      <p class="note" id="l-etat"></p>
+    </article>
+  </section>
+
   <!-- REGLAGES -->
   <section id="v-reglages" class="vue" hidden>
     <article class="carte">
       <h2>Teleinfo</h2>
       <nav class="menu">
         <a href="#messages">Messages du compteur<span>étiquettes TIC en clair</span></a>
+        <a href="#led">LED du module<span>heures creuses, couleur du jour, règles</span></a>
         <a href="#reglage=/tic-cfg">Compteur et publication<span>mode, données, intégrations</span></a>
         <a href="#reglage=/relay">Relais virtuels<span>association aux périodes</span></a>
         <a href="#reglage=/solar-cfg">Production solaire</a>
@@ -189,6 +210,7 @@
 <script src="messages.js"></script>
 <script src="histo.js"></script>
 <script src="reglages.js"></script>
+<script src="led.js"></script>
 <script src="ha.js"></script>
 </body>
 </html>

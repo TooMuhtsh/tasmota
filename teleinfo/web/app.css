@@ -98,6 +98,10 @@ main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
 .tic dt code { font-size: 12px; color: var(--texte-2); }
 .tic dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; word-break: break-word; }
 .tic dd.nul { color: var(--texte-2); }
+.tic dd.cache { color: var(--primaire); cursor: pointer; min-height: 24px; border-radius: 8px; }
+.tic dd.cache::after { display: block; content: "afficher"; font-size: 12px; color: var(--texte-2); }
+.tic dd.cache[aria-pressed="true"]::after { content: "masquer"; }
+.tic dd.cache:focus-visible { outline: 2px solid var(--primaire); outline-offset: 2px; }
 .tic .ko { color: #f44336; }
 .tic code.somme { font-size: 12px; color: var(--texte-2); }
 .alerte { margin: 8px 0 0; padding: 8px 12px; border-radius: 8px; background: rgba(244,67,54,.14); color: #f44336; font-size: 14px; }
@@ -163,3 +167,25 @@ main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
 .menu a, .retour, .lien { min-height: 48px; display: flex; flex-direction: column; justify-content: center; }
 .retour, .lien { display: inline-flex; }
 .liste dd.ko { color: #f44336; }
+
+/* LED du module */
+.led-pastille { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--trait); box-shadow: 0 0 12px currentColor; }
+.led-pastille.cli { animation: led-cli 2s steps(1) infinite; }
+@keyframes led-cli { 50% { opacity: .15; } }
+@media (prefers-reduced-motion: reduce) { .led-pastille.cli { animation: none; } }
+#v-led .ligne { justify-content: flex-start; gap: 12px; margin-bottom: 8px; }
+#v-led input[type=color] { width: 56px; height: 40px; padding: 2px; border: 1px solid var(--trait); border-radius: 8px; background: none; }
+#v-led input[type=range] { flex: 1; accent-color: var(--primaire); min-height: 48px; }
+#v-led .saisie input[type=range] { width: auto; border: 0; padding: 0; }
+#l-nuit-heures { gap: 8px; }
+#l-nuit-heures .champ { flex: 1; }
+#l-nuit-heures .champ select { max-width: none; }
+.regle { padding: 8px 0; }
+.regle .haut, .regle .bas { display: flex; align-items: center; gap: 8px; }
+.regle .bas { margin-top: 4px; }
+.regle .w { font-style: normal; color: var(--texte-2); }
+.regle + .regle { border-top: 1px solid var(--trait); }
+.regle select { flex: 1; min-width: 0; min-height: 48px; padding: 0 8px; border: 1px solid var(--trait); border-radius: 8px; background: var(--carte); color: var(--texte); font: inherit; }
+.regle input[data-r=seuil] { width: 88px; min-height: 48px; padding: 0 8px; border: 1px solid var(--trait); border-radius: 8px; background: none; color: var(--texte); font: inherit; }
+.regle .mini { display: flex; align-items: center; gap: 6px; min-height: 48px; font-size: 14px; color: var(--texte-2); }
+.regle [data-suppr] { margin: 0 0 0 auto; min-width: 48px; }

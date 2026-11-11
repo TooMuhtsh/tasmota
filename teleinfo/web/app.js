@@ -287,16 +287,17 @@ let vue = '', pageReglage = '';
 document.querySelectorAll('[data-module]').forEach(a => { a.href = MODULE + a.dataset.module; });
 function afficher() {
   const [v, arg] = (location.hash || '#accueil').slice(1).split('=');
-  vue = ['accueil', 'courbes', 'historique', 'messages', 'reglages', 'reglage'].includes(v) ? v : 'accueil';
+  vue = ['accueil', 'courbes', 'historique', 'messages', 'reglages', 'reglage', 'led'].includes(v) ? v : 'accueil';
   pageReglage = arg || '';
   document.querySelectorAll('.vue').forEach(s => { s.hidden = s.id !== 'v-' + vue; });
-  document.querySelectorAll('.onglets a').forEach(a => a.classList.toggle('actif', a.dataset.vue === (['messages', 'reglage'].includes(vue) ? 'reglages' : vue)));
-  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', historique: 'Historique', messages: 'Messages', reglages: 'Réglages', reglage: 'Réglages' }[vue];
+  document.querySelectorAll('.onglets a').forEach(a => a.classList.toggle('actif', a.dataset.vue === (['messages', 'reglage', 'led'].includes(vue) ? 'reglages' : vue)));
+  $('titre').textContent = { accueil: 'Teleinfo', courbes: 'Courbes', historique: 'Historique', messages: 'Messages', reglages: 'Réglages', reglage: 'Réglages', led: 'LED du module' }[vue];
   if (vue === 'courbes') majCourbe();
   if (vue === 'messages' && typeof majMessages === 'function') majMessages();
   if (vue === 'historique' && typeof majHisto === 'function') majHisto();
   if (vue === 'reglage' && typeof majReglage === 'function') majReglage(pageReglage);
   if (vue === 'reglages' && typeof majHa === 'function') majHa();
+  if (vue === 'led' && typeof majLed === 'function') majLed();
 }
 addEventListener('hashchange', afficher);
 
