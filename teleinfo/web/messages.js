@@ -142,4 +142,77 @@ $('m-copier').addEventListener('click', async () => {
   setTimeout(() => { b.textContent = avant; }, 2000);
 });
 
+
+/* ---------- capture de trames pour un rapport de bug ----------
+   Le navigateur ne peut pas lire le flux brut (serveur TCP du module) : la capture reconstitue chaque trame à partir de
+   /tic-msg.upd, lu toutes les 500 ms pendant la durée choisie. Les étiquettes et leurs sommes de contrôle sont celles du
+   compteur ; ADSC/ADCO/PRM sont remplacés par des zéros avec une somme recalculée (lignes toujours valides). */
+const capture = { trames: [], nums: new Set(), fin: 0, minuteur: 0, mode: '' };
+// somme de contrôle : mode Standard = étiquette à dernière tabulation incluse ; Historique = étiquette à l'espace avant la somme exclu
+const somme = (corps) => String.fromCharCode(([...corps].reduce((a, c) => a + c.charCodeAt(0), 0) & 0x3F) + 0x20);
+function ligneTic(l, masquer, standard) {
+  const sep = standard ? '\t' : ' ';
+  let val = l.val;
+  // les étiquettes horodatées sont affichées « date valeur » : on rétablit le séparateur du compteur
+  const m = /^([HE ]\d{12}) +(.*)$/.exec(val);
+  if (m && standard) val = m[1] + sep + m[2];
+  if (masquer && SECRETS.test(l.cle)) {
+    val = '0'.repeat(l.val.length);
+    const corps = l.cle + sep + val + (standard ? sep : '');
+    return '\n' + corps + (standard ? '' : ' ') + somme(corps) + '\r';
+  }
+  // la page Messages retire les espaces de fin (NGTF, LTARF sur 16 caractères) et le champ vide de DATE :
+  // on retrouve la forme exacte envoyée par le compteur grâce à sa somme de contrôle
+  if (standard) {
+    const essais = [val];
+    for (let k = 1; val.length + k <= 16; k++) essais.push(val + ' '.repeat(k));
+    if (/^[HE ]\d{12}$/.test(val)) essais.push(val + sep);
+    const bon = essais.find(v => somme(l.cle + sep + v + sep) === l.somme);
+    if (bon !== undefined) val = bon;
+  }
+  return '\n' + l.cle + sep + val + sep + l.somme + '\r';
+}
+async function tourCapture() {
+  try {
+    const { lignes, nb } = analyserLignes(await lire('/tic-msg.upd'));
+    derniereLecture = Date.now();
+    if (nb && !capture.nums.has(nb) && lignes.length) {
+      capture.nums.add(nb);
+      capture.trames.push({ nb, lignes });
+      capture.mode = lignes.some(l => l.cle === 'SINSTS' || l.cle === 'ADSC') ? 'standard' : 'historique';
+    }
+  } catch (e) { console.warn(e); }
+  const reste = Math.max(0, capture.fin - Date.now());
+  const n = capture.trames.length, ecart = n > 1 ? capture.trames.at(-1).nb - capture.trames[0].nb + 1 - n : 0;
+  $('c-etat').textContent = `${n} trame${n > 1 ? 's' : ''} capturée${n > 1 ? 's' : ''}` + (ecart > 0 ? ` (${ecart} manquée${ecart > 1 ? 's' : ''})` : '')
+    + (reste ? ` · encore ${Math.ceil(reste / 1000)} s` : '');
+  if (reste && capture.minuteur) capture.minuteur = setTimeout(tourCapture, 500);
+  else finCapture();
+}
+function finCapture() {
+  clearTimeout(capture.minuteur); capture.minuteur = 0;
+  $('c-etat').textContent = $('c-etat').textContent.replace(/ · encore \d+ s$/, '');
+  $('c-lancer').textContent = 'Lancer la capture';
+  $('c-telecharger').hidden = !capture.trames.length;
+}
+$('c-lancer').addEventListener('click', () => {
+  if (capture.minuteur) { capture.fin = 0; return finCapture(); }
+  Object.assign(capture, { trames: [], nums: new Set(), fin: Date.now() + +$('c-duree').value * 60e3, minuteur: 1 });
+  $('c-lancer').textContent = 'Arrêter';
+  $('c-telecharger').hidden = true;
+  tourCapture();
+});
+$('c-telecharger').addEventListener('click', () => {
+  const masquer = !$('c-brut').checked, standard = capture.mode === 'standard';
+  const texte = capture.trames.map(t => '\x02' + t.lignes.map(l => ligneTic(l, masquer, standard)).join('') + '\x03').join('');
+  const a = document.createElement('a');
+  const d = new Date(), z = n => String(n).padStart(2, '0');
+  const quand = `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`;
+  a.href = URL.createObjectURL(new Blob([texte], { type: 'application/octet-stream' }));
+  a.download = `teleinfo-${capture.mode}-${quand}${masquer ? '-anonyme' : ''}.log`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+});
+
 if (vue === 'messages') majMessages();
+

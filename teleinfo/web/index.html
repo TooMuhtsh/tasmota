@@ -116,6 +116,14 @@
       <label class="interrupteur"><input type="checkbox" id="m-somme"><span></span>Afficher les sommes de contrôle</label>
       <button class="bouton" id="m-copier">Copier la trame</button>
     </article>
+    <article class="carte">
+      <h2>Capture pour un rapport de bug</h2>
+      <p class="note">Enregistre les trames reçues pendant la durée choisie, dans un fichier à joindre à un ticket. Les identifiants du compteur sont remplacés par des zéros.</p>
+      <label class="champ"><span>Durée</span><select id="c-duree"><option value="1">1 minute</option><option value="5" selected>5 minutes</option><option value="10">10 minutes</option></select></label>
+      <label class="interrupteur"><input type="checkbox" id="c-brut"><span></span><b>Garder les identifiants<small>à ne pas publier</small></b></label>
+      <div class="ligne"><button class="bouton" id="c-lancer">Lancer la capture</button><button class="bouton texte" id="c-telecharger" hidden>Télécharger</button></div>
+      <p class="note" id="c-etat"></p>
+    </article>
     <div id="m-groupes" class="pile"></div>
   </section>
 
