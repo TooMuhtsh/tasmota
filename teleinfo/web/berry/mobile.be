@@ -1,6 +1,7 @@
 # Interface mobile Teleinfo servie par le module, sans recompiler le firmware.
 # Les fichiers de l'interface sont copiés dans le système de fichiers (mobile-*.html/css/js) ;
-# ce pilote Berry les sert sur /m et ajoute un bouton sur la page d'accueil d'origine.
+# ce pilote Berry les sert sur /m, ajoute un bouton sur les pages d'origine et fait de /m la page d'accueil
+# (l'accueil d'origine reste accessible sur /?orig).
 # Installation : copier ce fichier et les fichiers mobile-* à la racine, puis ajouter load('mobile.be') dans autoexec.be.
 import webserver
 import string
@@ -47,7 +48,11 @@ class TeleinfoMobile
   def bouton()
     webserver.content_send("<p></p><form action='/m' method='get'><button>Interface mobile</button></form>")
   end
-  def web_add_main_button() self.bouton() end
+  # accueil d'origine : redirige vers /m, sauf si on l'a demandé explicitement (/?orig, lien « Interface d'origine »)
+  def web_add_main_button()
+    self.bouton()
+    webserver.content_send("<script>if(location.search.indexOf('orig')<0)location.replace('/m');</script>")
+  end
   def web_add_config_button() self.bouton() end
   def web_add_management_button() self.bouton() end
 end
