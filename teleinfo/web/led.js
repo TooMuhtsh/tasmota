@@ -44,8 +44,11 @@ function dessinerLed() {
   zone.hidden = !['hphc', 'jour', 'perso'].includes(m);
   if (m === 'hphc') zone.innerHTML = '<h2>Couleurs</h2>' + couleurChamp('hp', 'Heures pleines') + couleurChamp('hc', 'Heures creuses');
   if (m === 'jour') zone.innerHTML = '<h2>Couleurs</h2>' + couleurChamp('bleu', 'Jour bleu') + couleurChamp('blanc', 'Jour blanc') + couleurChamp('rouge', 'Jour rouge')
+    + '<label class="champ"><span>Clignote en</span><select data-cle="cli_jour">'
+    + [['non', 'jamais'], ['hc', 'heures creuses'], ['hp', 'heures pleines']].map(([v, l]) => `<option value="${v}"${c.cli_jour === v ? ' selected' : ''}>${l}</option>`).join('')
+    + '</select></label>'
     + interrupteur('hc_doux', 'Plus douce en heures creuses', 'luminosité divisée par trois')
-    + interrupteur('alerte_demain', 'Clignote la veille d\'un jour rouge', 'dès que le compteur annonce le lendemain');
+    + interrupteur('alerte_demain', 'Clignote vite la veille d\'un jour rouge', 'dès que le compteur annonce le lendemain');
   if (m === 'perso') zone.innerHTML = '<h2>Règles</h2><p class="note">Lues dans l\'ordre : la première vraie donne la couleur.</p>'
     + `<div id="l-regles">${c.regles.map(regleLigne).join('')}</div>`
     + '<button type="button" class="bouton texte" id="l-ajouter">+ Ajouter une règle</button>'
@@ -64,7 +67,8 @@ function dessinerMaintenant() {
   const p = $('l-pastille');
   p.style.background = p.style.color = ci ? hex(ci[0]) : 'transparent';
   p.style.opacity = ci ? Math.max(.6, ci[1] / 100) : 1;
-  p.classList.toggle('cli', !!ci?.[2]);
+  p.classList.toggle('cli', ci?.[2] === 1);
+  p.classList.toggle('cli-vite', ci?.[2] === 2);
   const morceaux = [];
   if (k.hour) morceaux.push(k.hour === 'Creuse' ? 'heures creuses' : 'heures pleines');
   if (k.color && k.color !== 'Inconnu') morceaux.push('jour ' + k.color.toLowerCase());
@@ -77,7 +81,7 @@ function dessinerMaintenant() {
 function lireLed() {
   const c = led.cfg;
   c.mode = document.querySelector('input[name="l-mode"]:checked')?.value || c.mode;
-  document.querySelectorAll('#v-led [data-cle]').forEach(e => { c[e.dataset.cle] = e.type === 'checkbox' ? e.checked : sansDiese(e.value); });
+  document.querySelectorAll('#v-led [data-cle]').forEach(e => { c[e.dataset.cle] = e.type === 'checkbox' ? e.checked : e.type === 'color' ? sansDiese(e.value) : e.value; });
   if (c.mode === 'perso') {
     c.regles = [...document.querySelectorAll('#l-regles .regle')].map(d => {
       const v = n => d.querySelector(`[data-r="${n}"]`);

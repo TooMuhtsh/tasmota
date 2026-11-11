@@ -63,9 +63,9 @@ end
 # Mode « origine » : le firmware garde la main (sa propre LED clignotante, EnergyConfig period=1).
 class TeleinfoLed
   static defaut = {'mode': 'origine', 'bri': 30, 'hp': 'FF6D00', 'hc': '00C853',
-                   'bleu': '2962FF', 'blanc': 'FFFFFF', 'rouge': 'FF1744', 'hc_doux': true, 'alerte_demain': true,
+                   'bleu': '2962FF', 'blanc': 'FFFFFF', 'rouge': 'FF1744', 'hc_doux': false, 'cli_jour': 'non', 'alerte_demain': true,
                    'regles': [], 'autre': '000000', 'nuit': false, 'nuit_de': 23, 'nuit_a': 7}
-  var cfg, contrat, puissance, cible, phase, appliquee
+  var cfg, contrat, puissance, cible, phase, appliquee, tic
 
   def init()
     import persist
@@ -76,6 +76,7 @@ class TeleinfoLed
     self.contrat = {}
     self.puissance = 0
     self.phase = true
+    self.tic = 0
     tasmota.add_rule('Tele#CONTRACT', def (v) if type(v) == 'instance' self.contrat = v self.calculer() end end, 'mobile_led')
     tasmota.add_rule('ENERGY#Power', def (v) self.puissance = v end, 'mobile_led')
     tasmota.add_driver(self)
@@ -108,12 +109,14 @@ class TeleinfoLed
       var j = self.couleur_jour(self.contrat.find('color'))
       if j != nil
         cible = [c[j], (c['hc_doux'] && self.condition('hc')) ? bri / 3 : bri, false]
-        if c['alerte_demain'] && self.condition('demain_rouge') cible[2] = true end
+        # clignotement lent : heures creuses ou pleines selon le choix ; rapide : la veille d'un jour rouge (prioritaire)
+        if c['cli_jour'] == 'hc' || c['cli_jour'] == 'hp' if self.condition(c['cli_jour']) cible[2] = 1 end end
+        if c['alerte_demain'] && self.condition('demain_rouge') cible[2] = 2 end
       end
     elif m == 'perso'
       for r : c['regles']
         if self.condition(r.find('si'), r.find('seuil', 0))
-          cible = [r.find('rgb', 'FFFFFF'), bri, r.find('cli', false)]
+          cible = [r.find('rgb', 'FFFFFF'), bri, r.find('cli', false) ? 1 : false]
           break
         end
       end
@@ -150,10 +153,15 @@ class TeleinfoLed
     end
   end
 
-  def every_second()
-    self.phase = !self.phase
-    if self.cible != nil && !self.cible[2] self.phase = true end
-    if self.cfg['mode'] == 'perso' self.calculer() end   # règle sur la puissance : réévaluée chaque seconde
+  # cadence 250 ms : clignotement lent (1 s allumée, 1 s atténuée) ou rapide (250 ms)
+  def every_250ms()
+    self.tic = (self.tic + 1) % 4
+    if self.tic == 0 && self.cfg['mode'] == 'perso' self.calculer() end   # règle sur la puissance : chaque seconde
+    var cli = self.cible != nil ? self.cible[2] : false
+    if !cli self.phase = true
+    elif cli == 2 self.phase = !self.phase
+    elif self.tic == 0 self.phase = !self.phase
+    end
     self.appliquer()
   end
 

@@ -189,3 +189,5 @@ main { max-width: 640px; margin: 0 auto; padding: 0 12px; }
 .regle input[data-r=seuil] { width: 88px; min-height: 48px; padding: 0 8px; border: 1px solid var(--trait); border-radius: 8px; background: none; color: var(--texte); font: inherit; }
 .regle .mini { display: flex; align-items: center; gap: 6px; min-height: 48px; font-size: 14px; color: var(--texte-2); }
 .regle [data-suppr] { margin: 0 0 0 auto; min-width: 48px; }
+.led-pastille.cli-vite { animation: led-cli .5s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .led-pastille.cli-vite { animation: none; } }
