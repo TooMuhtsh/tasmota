@@ -44,15 +44,32 @@ async function chargerFichier(f) {
   return lignes;
 }
 
-// consommation de chaque heure = différence avec la ligne suivante, rangée à l'heure de la ligne
-function heures(lignes) {
+// consommation de chaque heure. Le module écrit une ligne au changement d'heure, datée de l'heure
+// qui vient de finir (xdrv_98_03_teleinfo_histo.ino) : la ligne de HH h contient l'index à HH+1 h.
+// La consommation de l'heure HH est donc ligne(HH) − ligne(HH−1), rangée à l'heure de la ligne la plus récente.
+function heures(lignes, direct) {
   const r = [];
   for (let i = 0; i + 1 < lignes.length; i++) {
     const a = lignes[i], b = lignes[i + 1];
     if (b.t - a.t > 3 * 3600e3 || b.t <= a.t) continue;          // trou ou désordre : on n'invente rien
-    r.push({ t: a.t, v: b.v.map((x, k) => Math.max(0, x - (a.v[k] ?? x))) });
+    r.push({ t: b.t, v: b.v.map((x, k) => Math.max(0, x - (a.v[k] ?? x))) });
   }
+  // heure en cours : index en direct moins la dernière ligne (index de début de l'heure en cours)
+  const der = lignes[lignes.length - 1];
+  if (direct && der && Date.now() - der.t < 2 * 3600e3)
+    r.push({ t: new Date(+der.t + 3600e3), v: der.v.map((x, k) => direct[k] > x ? direct[k] - x : 0) });
   return r;
+}
+
+// index en direct du contrat en cours (mode Standard : EASF01…), pour compléter l'heure en cours
+async function indexDirect() {
+  try {
+    const t = analyserTic(await lire('/tic-msg.upd'));
+    if (!t.NGTF || !t.EASF01) return null;
+    const v = [];
+    for (let k = 1; k <= 10 && t['EASF' + String(k).padStart(2, '0')]; k++) v.push(+t['EASF' + String(k).padStart(2, '0')]);
+    return { contrat: t.NGTF.replace(/ /g, ''), v };
+  } catch (e) { return null; }
 }
 
 function bornes() {
@@ -110,8 +127,10 @@ async function dessinerHisto(contratSeul) {
   const fichiers = histo.fichiers.filter(f => (tous || f.contrat === choix) && f.an >= debut.getFullYear() && f.an <= new Date(fin - 1).getFullYear());
   const series = [];                      // séries empilées : { nom, type, v: [n] }
   const parContrat = {}, contrats = [...new Set(fichiers.map(f => f.contrat))];
+  const enCours = +fin > Date.now() ? await indexDirect() : null;
   for (const f of fichiers) {
-    for (const h of heures(await chargerFichier(f))) {
+    const direct = enCours && enCours.contrat === f.contrat && f.an === new Date().getFullYear() ? enCours.v : null;
+    for (const h of heures(await chargerFichier(f), direct)) {
       if (h.t < debut || h.t >= fin) continue;
       const i = case_(h.t, debut);
       if (tous) {
