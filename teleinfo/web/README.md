@@ -39,6 +39,12 @@ teleinfo/web/berry/installer.sh <IP du module> --permanent  # chargé à chaque 
 
 Pour retirer : supprimer `mobile.be`, les fichiers `mobile-*` et la ligne `load('mobile.be')` de `autoexec.be` depuis le gestionnaire de fichiers.
 
+## Chrome sur Android : ERR_TOO_MANY_RETRIES
+
+Les versions récentes d'Android demandent à chaque application l'autorisation de joindre les appareils du réseau local. Si Chrome ne l'a pas, la page du module ne s'ouvre pas et Chrome affiche `ERR_TOO_MANY_RETRIES`, alors que Firefox fonctionne. La page ne peut rien y faire, car la requête ne quitte pas le téléphone.
+
+Pour corriger : appui long sur Chrome, Infos sur l'appli, Autorisations, puis autoriser « Réseau local » (ou « Appareils à proximité » selon la version). Fermer Chrome complètement et rouvrir l'adresse du module.
+
 ## Suite
 
 L'avancement est suivi dans les issues du dépôt (étiquette `interface-mobile`).
